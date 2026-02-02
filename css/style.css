@@ -1,0 +1,852 @@
+/* ========================================
+   旅行スケジュール管理 - メインスタイルシート
+   レスポンシブデザイン対応（PC、タブレット、スマートフォン）
+   ======================================== */
+
+/* ========== CSS変数（カラーテーマ） ========== */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --background-color: #f4f7f6;
+    --text-color: #333;
+    --light-text: #7f8c8d;
+    --white: #ffffff;
+    --border-color: #ddd;
+    --shadow: 0 2px 5px rgba(0,0,0,0.1);
+    --header-height: 60px;
+}
+
+/* ========== リセット・基本スタイル ========== */
+/* ブラウザのデフォルトスタイルをリセット */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* ========== レイアウト ========== */
+/* コンテナー：最大幅を1200pxに制限して中央寄せ */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* ========== ヘッダー ========== */
+/* ページ上部の固定ヘッダー。スクロール時も常に表示される */
+header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 10px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* 旅行切替 UI */
+.trip-switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trip-switcher select {
+    min-width: 200px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+}
+
+.trip-switcher button {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.08);
+    color: var(--white);
+    cursor: pointer;
+}
+
+.trip-switcher button:hover {
+    background: rgba(255,255,255,0.16);
+}
+
+header h1 {
+    font-size: 1.2rem;
+}
+
+.header-actions button {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: var(--white);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.header-actions button:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* ========== ナビゲーション ========== */
+/* 各機能タブの切り替えボタン */
+.main-nav {
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox: スクロールバーを非表示 */
+}
+
+/* Chrome/Safari用：スクロールバーを非表示 */
+.main-nav ul::-webkit-scrollbar {
+    display: none;
+}
+
+.main-nav li {
+    padding: 12px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    color: var(--light-text);
+    border-bottom: 3px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+}
+
+.main-nav li i {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+.main-nav li.active {
+    color: var(--secondary-color);
+    border-bottom-color: var(--secondary-color);
+}
+
+/* ========== タブコンテンツ ========== */
+/* 各タブに関連するコンテンツの表示制御 */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ========== セクションヘッダー ========== */
+/* 各セクションのタイトルと追加ボタン */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* セクション内のボタン配置とビュー切替ボタン */
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.view-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #ecf0f1;
+}
+
+.toggle-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.toggle-btn.active {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+.toggle-btn:not(.active):hover {
+    background-color: #e5edf7;
+}
+
+/* ========== ボタン ========== */
+/* プライマリボタン（主要アクション） */
+.btn-primary {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+/* セカンダリボタン（副次アクション） */
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-danger {
+    background-color: var(--accent-color);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+/* ========== 空状態メッセージ ========== */
+/* データが登録されていない場合の表示 */
+.empty-message {
+    text-align: center;
+    color: var(--light-text);
+    padding: 40px 0;
+}
+
+/* ========== モーダルウィンドウ ========== */
+/* 各種フォーム入力用ダイアログボックス */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: var(--white);
+    margin: 10% auto;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.close-btn {
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .main-nav li {
+        flex-direction: row;
+        font-size: 1rem;
+    }
+    
+    .main-nav li i {
+        margin-bottom: 0;
+        margin-right: 8px;
+    }
+    
+    .modal-content {
+        margin: 50px auto;
+    }
+}
+
+/* Settings */
+#global-notes {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    resize: vertical;
+}
+
+.user-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.user-chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Schedule List Styles */
+.schedule-date-group {
+    margin-bottom: 25px;
+}
+
+.date-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.date-header {
+    font-size: 1rem;
+    color: var(--primary-color);
+    background-color: #eee;
+    padding: 8px 15px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.date-header-row .date-header {
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.add-date-btn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+}
+
+.schedule-item {
+    background-color: var(--white);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.schedule-time {
+    font-weight: bold;
+    color: var(--secondary-color);
+    min-width: 90px;
+    font-size: 0.9rem;
+}
+
+.schedule-info {
+    flex: 1;
+}
+
+.schedule-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.schedule-desc {
+    font-size: 0.9rem;
+    color: var(--light-text);
+    margin-bottom: 5px;
+}
+
+.schedule-loc {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.schedule-actions button {
+    background: none;
+    border: none;
+    color: var(--light-text);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.schedule-actions button:hover {
+    color: var(--accent-color);
+}
+
+.schedule-actions .edit-btn:hover {
+    color: var(--secondary-color);
+}
+
+/* 場所リンク（リスト/タイムライン共通） */
+.loc-inline {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.loc-inline:hover {
+    color: var(--secondary-color);
+}
+
+/* Timeline Styles */
+.timeline-container {
+    margin-top: 10px;
+}
+
+.timeline-day {
+    margin-bottom: 25px;
+}
+
+.timeline-date-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.timeline-date {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.timeline-date-row .timeline-date {
+    margin-bottom: 0;
+}
+
+.timeline-items {
+    border-left: 2px solid #e0e0e0;
+    padding-left: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.timeline-item {
+    position: relative;
+    background-color: var(--white);
+    padding: 12px 14px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--secondary-color);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.timeline-time {
+    font-weight: 700;
+    color: var(--secondary-color);
+    min-width: 90px;
+}
+
+.timeline-content {
+    flex: 1;
+}
+
+.timeline-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.timeline-desc {
+    font-size: 0.9rem;
+    color: var(--light-text);
+    margin-bottom: 4px;
+}
+
+.timeline-loc {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+}
+
+.timeline-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.timeline-actions button {
+    background: none;
+    border: none;
+    color: var(--light-text);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.timeline-actions button:hover {
+    color: var(--accent-color);
+}
+
+/* 場所詳細モーダルの行表示 */
+.location-detail {
+    display: grid;
+    gap: 8px;
+}
+
+.loc-row strong {
+    margin-right: 6px;
+}
+
+/* Location Grid Styles */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.location-card {
+    background-color: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.location-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.location-img-placeholder {
+    width: 100%;
+    height: 150px;
+    background-color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ccc;
+    font-size: 3rem;
+}
+
+.location-body {
+    padding: 15px;
+    flex: 1;
+}
+
+.location-name {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.location-address, .location-hours {
+    font-size: 0.85rem;
+    color: var(--light-text);
+    margin-bottom: 5px;
+}
+
+.location-links {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.loc-link {
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--secondary-color);
+    background-color: #ebf5fb;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.loc-link:hover {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+.location-actions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    gap: 5px;
+    background: rgba(255,255,255,0.8);
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.location-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: var(--light-text);
+}
+
+.location-actions button:hover {
+    color: var(--accent-color);
+}
+
+/* Expense Styles */
+.expense-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.summary-card, .settlement-card {
+    background-color: var(--white);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    flex: 1;
+    min-width: 200px;
+}
+
+.summary-card .label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--light-text);
+}
+
+.summary-card .value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.settlement-card h4 {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+
+.settlement-card ul {
+    list-style: none;
+    font-size: 0.9rem;
+}
+
+.settlement-card li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.plus { color: #27ae60; font-weight: bold; }
+.minus { color: #e74c3c; font-weight: bold; }
+
+.expense-item {
+    background-color: var(--white);
+    padding: 12px 15px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.expense-title {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.expense-meta {
+    font-size: 0.8rem;
+    color: var(--light-text);
+}
+
+.expense-meta span {
+    margin-right: 10px;
+}
+
+.expense-details {
+    text-align: right;
+    margin: 0 15px;
+}
+
+.expense-amount {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.expense-payer {
+    font-size: 0.8rem;
+    color: var(--light-text);
+}
+
+.expense-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: var(--light-text);
+}
+
+.expense-actions button:hover {
+    color: var(--accent-color);
+}
+
+/* Task Styles */
+.task-item {
+    background-color: var(--white);
+    padding: 12px 15px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.3s;
+}
+
+.task-item.completed {
+    opacity: 0.6;
+}
+
+.task-item.completed .task-title {
+    text-decoration: line-through;
+}
+
+.task-check {
+    margin-right: 15px;
+}
+
+.task-check input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-title {
+    font-weight: 500;
+}
+
+.task-meta {
+    font-size: 0.8rem;
+    color: var(--light-text);
+    display: flex;
+    gap: 12px;
+    margin-top: 2px;
+}
+
+.task-priority {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    color: var(--white);
+}
+
+.priority-high { background-color: var(--accent-color); }
+.priority-medium { background-color: #f39c12; }
+.priority-low { background-color: #bdc3c7; }
+
+.task-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: var(--light-text);
+}
+
+.task-actions button:hover {
+    color: var(--accent-color);
+}
