@@ -72,8 +72,8 @@ header .container {
     padding: 6px 8px;
     border-radius: 4px;
     border: 1px solid rgba(255,255,255,0.4);
-    background: rgba(255,255,255,0.1);
-    color: var(--white);
+    background: var(--white);
+    color: var(--text-color);
 }
 
 .trip-switcher button {
@@ -398,11 +398,31 @@ header h1 {
     padding: 8px 15px;
     border-radius: 4px;
     margin-bottom: 10px;
+    height: 40px;
+    display: flex;
+    align-items: center;
 }
 
 .date-header-row .date-header {
     margin-bottom: 0;
     flex: 1;
+}
+
+.date-main-event {
+    flex: 2;
+    min-width: 180px;
+}
+
+.main-event-input {
+    width: 100%;
+    padding: 8px 15px;
+    border-radius: 4px;
+    border: 0;
+    background-color: #eee;
+    color: var(--primary-color);
+    font-size: 1rem;
+    font-weight: 500;
+    height: 40px;
 }
 
 .add-date-btn {
@@ -849,4 +869,38 @@ header h1 {
 
 .task-actions button:hover {
     color: var(--accent-color);
+}
+
+/* ========== 設定セクション ========== */
+.settings-section {
+    background-color: var(--white);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+}
+
+.settings-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.categories-list {
+    margin-bottom: 15px;
+}
+
+.category-item {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    padding: 10px !important;
+    background: #f5f5f5 !important;
+    border-radius: 4px !important;
+    margin-bottom: 8px !important;
+}
+
+.category-item button {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
 }

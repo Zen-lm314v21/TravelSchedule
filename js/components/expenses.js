@@ -42,7 +42,9 @@ function renderExpenseList() {
     let html = '';
 
     expenses.sort((a, b) => b.date.localeCompare(a.date)).forEach(exp => {
-        total += exp.amount;
+        if (exp.amount !== null && exp.amount !== undefined) {
+            total += exp.amount;
+        }
         const payer = users.find(u => u.id === exp.paidBy);
         
         html += `
@@ -55,7 +57,7 @@ function renderExpenseList() {
                     </div>
                 </div>
                 <div class="expense-details">
-                    <div class="expense-amount">¥${exp.amount.toLocaleString()}</div>
+                    <div class="expense-amount">${exp.amount !== null && exp.amount !== undefined ? '¥' + exp.amount.toLocaleString() : '未定'}</div>
                     <div class="expense-payer">支払者: ${payer ? payer.name : '不明'}</div>
                 </div>
                 <div class="expense-actions">
@@ -138,6 +140,19 @@ function showExpenseModal(expenseId = null) {
     const exp = expenseId ? trip.expenses.find(e => e.id === expenseId) : null;
     const users = getUsers();
 
+    // 設定からカテゴリーを取得
+    const expenseCategories = trip.settings?.expenseCategories || [
+        { value: 'food', label: '食事' },
+        { value: 'transport', label: '移動' },
+        { value: 'accommodation', label: '宿泊' },
+        { value: 'activity', label: '体験' },
+        { value: 'other', label: 'その他' }
+    ];
+
+    const categoryOptionsHtml = expenseCategories.map(cat =>
+        `<option value="${cat.value}" ${exp?.category === cat.value ? 'selected' : ''}>${cat.label}</option>`
+    ).join('');
+
     const title = exp ? '費用を編集' : '費用を追加';
     const bodyHtml = `
         <form id="expense-form">
@@ -146,8 +161,8 @@ function showExpenseModal(expenseId = null) {
                 <input type="text" id="exp-title" value="${exp ? exp.title : ''}" placeholder="例：ランチ代" required>
             </div>
             <div class="form-group">
-                <label for="exp-amount">金額 (¥) *</label>
-                <input type="number" id="exp-amount" value="${exp ? exp.amount : ''}" required>
+                <label for="exp-amount">金額 (¥)</label>
+                <input type="number" id="exp-amount" value="${exp ? exp.amount : ''}" placeholder="未定">
             </div>
             <div class="form-group">
                 <label for="exp-date">日付 *</label>
@@ -162,11 +177,7 @@ function showExpenseModal(expenseId = null) {
             <div class="form-group">
                 <label for="exp-category">カテゴリー</label>
                 <select id="exp-category">
-                    <option value="food" ${exp?.category === 'food' ? 'selected' : ''}>食事</option>
-                    <option value="transport" ${exp?.category === 'transport' ? 'selected' : ''}>移動</option>
-                    <option value="accommodation" ${exp?.category === 'accommodation' ? 'selected' : ''}>宿泊</option>
-                    <option value="activity" ${exp?.category === 'activity' ? 'selected' : ''}>体験/アクティビティ</option>
-                    <option value="other" ${exp?.category === 'other' ? 'selected' : ''}>その他</option>
+                    ${categoryOptionsHtml}
                 </select>
             </div>
             <div class="form-group">
@@ -183,10 +194,11 @@ function showExpenseModal(expenseId = null) {
             return false;
         }
 
+        const amountValue = document.getElementById('exp-amount').value;
         const newExp = {
             id: expenseId || generateId(),
             title: document.getElementById('exp-title').value,
-            amount: parseInt(document.getElementById('exp-amount').value, 10),
+            amount: amountValue ? parseInt(amountValue, 10) : null,
             date: document.getElementById('exp-date').value,
             paidBy: document.getElementById('exp-payer').value,
             category: document.getElementById('exp-category').value,

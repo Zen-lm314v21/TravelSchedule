@@ -27,6 +27,23 @@ const INITIAL_DATA = {
                 { id: 'u1', name: '自分', color: '#3498db' }
             ],
             globalNotes: '',
+            dayHighlights: {},
+            settings: {
+                scheduleCategories: [
+                    { value: 'unset', label: '未設定', color: '#bdc3c7' },
+                    { value: 'meal', label: '食事', color: '#e74c3c' },
+                    { value: 'transport', label: '移動', color: '#3498db' },
+                    { value: 'accommodation', label: '宿泊', color: '#9b59b6' },
+                    { value: 'activity', label: '体験/アクティビティ', color: '#f39c12' }
+                ],
+                expenseCategories: [
+                    { value: 'food', label: '食事' },
+                    { value: 'transport', label: '移動' },
+                    { value: 'accommodation', label: '宿泊' },
+                    { value: 'activity', label: '体験' },
+                    { value: 'other', label: 'その他' }
+                ]
+            },
             updatedAt: new Date().toISOString()
         }
     ],
@@ -63,6 +80,23 @@ export function loadData() {
             tasks: parsed.tasks || [],
             users: parsed.users || [{ id: 'u1', name: '自分', color: '#3498db' }],
             globalNotes: parsed.globalNotes || '',
+            dayHighlights: parsed.dayHighlights || {},
+            settings: {
+                scheduleCategories: [
+                    { value: 'unset', label: '未設定', color: '#bdc3c7' },
+                    { value: 'meal', label: '食事', color: '#e74c3c' },
+                    { value: 'transport', label: '移動', color: '#3498db' },
+                    { value: 'accommodation', label: '宿泊', color: '#9b59b6' },
+                    { value: 'activity', label: '体験/アクティビティ', color: '#f39c12' }
+                ],
+                expenseCategories: [
+                    { value: 'food', label: '食事' },
+                    { value: 'transport', label: '移動' },
+                    { value: 'accommodation', label: '宿泊' },
+                    { value: 'activity', label: '体験' },
+                    { value: 'other', label: 'その他' }
+                ]
+            },
             updatedAt: parsed.updatedAt || new Date().toISOString()
         };
 
@@ -78,6 +112,37 @@ export function loadData() {
     // currentTripIdが存在しない場合は先頭を選択
     if (!parsed.currentTripId && parsed.trips.length > 0) {
         parsed.currentTripId = parsed.trips[0].id;
+        saveData(parsed);
+    }
+
+    // 既存の旅行データにsettingsフィールドがない場合は追加
+    parsed.trips.forEach(trip => {
+        if (!trip.settings) {
+            trip.settings = {
+                scheduleCategories: [
+                    { value: 'unset', label: '未設定', color: '#bdc3c7' },
+                    { value: 'meal', label: '食事', color: '#e74c3c' },
+                    { value: 'transport', label: '移動', color: '#3498db' },
+                    { value: 'accommodation', label: '宿泊', color: '#9b59b6' },
+                    { value: 'activity', label: '体験/アクティビティ', color: '#f39c12' }
+                ],
+                expenseCategories: [
+                    { value: 'food', label: '食事' },
+                    { value: 'transport', label: '移動' },
+                    { value: 'accommodation', label: '宿泊' },
+                    { value: 'activity', label: '体験' },
+                    { value: 'other', label: 'その他' }
+                ]
+            };
+        }
+    });
+    
+    // settingsフィールドを追加した場合のみsaveData
+    let needsSave = false;
+    parsed.trips.forEach(trip => {
+        if (!trip.settings) needsSave = true;
+    });
+    if (needsSave) {
         saveData(parsed);
     }
 
@@ -122,6 +187,7 @@ export function createEmptyTrip(name = '新しい旅行') {
             { id: 'u1', name: '自分', color: '#3498db' }
         ],
         globalNotes: '',
+        dayHighlights: {},
         updatedAt: new Date().toISOString()
     };
 }
@@ -130,13 +196,42 @@ export function createEmptyTrip(name = '新しい旅行') {
  * exportToJson()
  * 現在のデータをJSONファイルとしてダウンロード
  */
-export function exportToJson() {
+export async function exportToJson() {
     const data = loadData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const content = JSON.stringify(data, null, 2);
+    const fileName = `travel_schedule_${new Date().toISOString().split('T')[0]}.json`;
+
+    // File System Access API が使える場合は保存先を選択
+    if (window.showSaveFilePicker) {
+        try {
+            const handle = await window.showSaveFilePicker({
+                suggestedName: fileName,
+                types: [
+                    {
+                        description: 'JSON file',
+                        accept: { 'application/json': ['.json'] }
+                    }
+                ]
+            });
+            const writable = await handle.createWritable();
+            await writable.write(content);
+            await writable.close();
+            return;
+        } catch (err) {
+            // キャンセル時は何もしない
+            if (err && err.name === 'AbortError') {
+                return;
+            }
+            // それ以外のエラーはフォールバック
+        }
+    }
+
+    // フォールバック: 従来のダウンロード
+    const blob = new Blob([content], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `travel_schedule_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = fileName;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -169,12 +264,42 @@ export function importFromJson(file) {
 
 /**
  * getSchedules()
- * スケジュール一覧を日時でソートして取得
+ * スケジュール一覧を日時でソートして取得（削除済みは除外）
  */
 export function getSchedules() {
     const trip = getCurrentTrip();
     const schedules = trip ? trip.schedules : [];
+    const filtered = schedules.filter(s => !s.isDeleted);
+    return [...filtered].sort((a, b) => {
+        const dateCompare = (a.date || '').localeCompare(b.date || '');
+        if (dateCompare !== 0) return dateCompare;
+        return (a.startTime || '').localeCompare(b.startTime || '');
+    });
+}
+
+/**
+ * getAllSchedules()
+ * スケジュール一覧を日時でソートして取得（削除済みも含む）
+ */
+export function getAllSchedules() {
+    const trip = getCurrentTrip();
+    const schedules = trip ? trip.schedules : [];
     return [...schedules].sort((a, b) => {
+        const dateCompare = (a.date || '').localeCompare(b.date || '');
+        if (dateCompare !== 0) return dateCompare;
+        return (a.startTime || '').localeCompare(b.startTime || '');
+    });
+}
+
+/**
+ * getDeletedSchedules()
+ * 削除済みスケジュール一覧を日時でソートして取得
+ */
+export function getDeletedSchedules() {
+    const trip = getCurrentTrip();
+    const schedules = trip ? trip.schedules : [];
+    const filtered = schedules.filter(s => s.isDeleted);
+    return [...filtered].sort((a, b) => {
         const dateCompare = (a.date || '').localeCompare(b.date || '');
         if (dateCompare !== 0) return dateCompare;
         return (a.startTime || '').localeCompare(b.startTime || '');
@@ -212,6 +337,35 @@ export function getUsers() {
 export function getGlobalNotes() {
     const trip = getCurrentTrip();
     return trip ? trip.globalNotes : '';
+}
+
+/**
+ * getDayHighlights()
+ * 日付ごとのメインイベント一覧を取得
+ */
+export function getDayHighlights() {
+    const trip = getCurrentTrip();
+    return trip && trip.dayHighlights ? trip.dayHighlights : {};
+}
+
+/**
+ * setDayHighlight()
+ * 指定日付のメインイベントを更新
+ * @param {string} date YYYY-MM-DD
+ * @param {string} text メインイベント
+ */
+export function setDayHighlight(date, text) {
+    const data = loadData();
+    const trip = getCurrentTrip(data);
+    if (!trip) return;
+    trip.dayHighlights = trip.dayHighlights || {};
+    const value = (text || '').trim();
+    if (value) {
+        trip.dayHighlights[date] = value;
+    } else {
+        delete trip.dayHighlights[date];
+    }
+    saveData(data);
 }
 
 export function updateGlobalNotes(notes) {

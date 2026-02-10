@@ -31,8 +31,8 @@
             </div>
             <!-- エクスポート・インポートボタン -->
             <div class="header-actions">
-                <button id="export-btn" title="データを保存 (JSON)"><i class="fas fa-download"></i></button>
-                <button id="import-btn" title="データの読み込み (JSON)"><i class="fas fa-upload"></i></button>
+                <button id="export-btn" title="データをエクスポート (JSON)"><i class="fas fa-upload"></i></button>
+                <button id="import-btn" title="データをインポート (JSON)"><i class="fas fa-download"></i></button>
                 <input type="file" id="import-input" style="display: none;" accept=".json">
             </div>
         </div>
@@ -53,6 +53,8 @@
                 <li data-tab="tasks"><i class="fas fa-check-square"></i><span>やること</span></li>
                 <!-- メモ・ユーザー設定タブ -->
                 <li data-tab="notes"><i class="fas fa-sticky-note"></i><span>メモ</span></li>
+                <!-- 設定タブ -->
+                <li data-tab="settings"><i class="fas fa-cog"></i><span>設定</span></li>
             </ul>
         </div>
     </nav>
@@ -69,6 +71,7 @@
                         <button class="toggle-btn" id="view-timeline-btn"><i class="fas fa-stream"></i> タイムライン</button>
                     </div>
                     <button class="btn-primary" id="add-schedule-btn"><i class="fas fa-plus"></i> 追加</button>
+                    <button class="btn-secondary" id="show-deleted-btn"><i class="fas fa-trash-restore"></i> 削除済み</button>
                 </div>
             </div>
             <div id="schedule-list" class="list-container">
@@ -140,6 +143,48 @@
                 </div>
                 <!-- 新規ユーザー追加ボタン -->
                 <button class="btn-secondary" id="add-user-btn"><i class="fas fa-user-plus"></i> ユーザー追加</button>
+            </div>
+        </section>
+
+        <!-- ========== 設定画面 ========== -->
+        <section id="settings" class="tab-content">
+            <div class="section-header">
+                <h2>設定</h2>
+            </div>
+            
+            <!-- ========== カテゴリー管理セクション ========== -->
+            <div class="settings-section">
+                <h3>スケジュールカテゴリー</h3>
+                <div id="schedule-categories" class="categories-list">
+                    <!-- JSで生成 -->
+                </div>
+                <button class="btn-secondary" id="add-schedule-category-btn"><i class="fas fa-plus"></i> カテゴリーを追加</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>費用カテゴリー</h3>
+                <div id="expense-categories" class="categories-list">
+                    <!-- JSで生成 -->
+                </div>
+                <button class="btn-secondary" id="add-expense-category-btn"><i class="fas fa-plus"></i> カテゴリーを追加</button>
+            </div>
+
+            <!-- ========== UIテーマ設定セクション ========== -->
+            <div class="settings-section">
+                <h3>UIテーマ</h3>
+                <div class="form-group">
+                    <label for="theme-select">テーマ選択</label>
+                    <select id="theme-select">
+                        <option value="light">ライト</option>
+                        <option value="dark">ダーク</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ========== データ管理セクション ========== -->
+            <div class="settings-section">
+                <h3>データ管理</h3>
+                <button class="btn-danger" id="reset-data-btn"><i class="fas fa-exclamation-triangle"></i> 全データをリセット</button>
             </div>
         </section>
     </main>

@@ -9,6 +9,7 @@ import { initLocations } from './components/locations.js';
 import { initExpenses } from './components/expenses.js';
 import { initTasks } from './components/tasks.js';
 import { initUsers } from './components/users.js';
+import { initSettings } from './components/settings.js';
 import { closeModal, showModal } from './ui.js';
 
 /* ========== DOMロード時の処理 ========== */
@@ -42,6 +43,7 @@ function initApp() {
     initExpenses();
     initTasks();
     initUsers();
+    initSettings();
 }
 
 /* ========== タブ切り替え処理 ========== */
@@ -181,10 +183,32 @@ function renderTripSelector() {
     const tripSelect = document.getElementById('trip-select');
     if (!tripSelect) return;
     const data = loadData();
-    const trips = getTrips();
+    let trips = getTrips();
     const current = getCurrentTrip(data);
+    
+    // 日本時刻で今日を計算
+    const now = new Date();
+    const jstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+    const today = jstDate.toISOString().split('T')[0];
 
-    tripSelect.innerHTML = trips.map(t => `<option value="${t.id}" ${current && current.id === t.id ? 'selected' : ''}>${t.name || '旅行'}</option>`).join('');
+    // 終了済みかどうかを判定
+    const isFinished = (trip) => trip.endDate && trip.endDate < today;
+
+    // 開始日でソートし、終了済みを下に
+    trips = trips.sort((a, b) => {
+        const aFinished = isFinished(a) ? 1 : 0;
+        const bFinished = isFinished(b) ? 1 : 0;
+        if (aFinished !== bFinished) return aFinished - bFinished;
+        return (a.startDate || '').localeCompare(b.startDate || '');
+    });
+
+    tripSelect.innerHTML = trips.map(t => {
+        const finished = isFinished(t);
+        console.log(`旅行: ${t.name}, 終了日: ${t.endDate}, 本日: ${today}, 終了済み: ${finished}`);
+        const label = finished ? `(終了) ${t.name || '旅行'}` : (t.name || '旅行');
+        const style = finished ? 'style="text-decoration: line-through;"' : '';
+        return `<option value="${t.id}" ${current && current.id === t.id ? 'selected' : ''} ${style}>${label}</option>`;
+    }).join('');
 }
 
 function openTripModal(mode = 'add') {

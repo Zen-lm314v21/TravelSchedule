@@ -25,11 +25,17 @@ export function showModal(title, bodyHtml, onSave) {
     const newSaveBtn = saveBtn.cloneNode(true);
     saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
     
-    newSaveBtn.addEventListener('click', () => {
-        if (onSave()) {
-            modal.style.display = 'none';
+   // onSaveがnullの場合は保存ボタンを非表示
+   if (onSave === null) {
+       newSaveBtn.style.display = 'none';
+   } else {
+       newSaveBtn.style.display = 'block';
+       newSaveBtn.addEventListener('click', () => {
+           if (onSave()) {
+               modal.style.display = 'none';
+           }
+       });
         }
-    });
 
     modal.style.display = 'block';
 }
