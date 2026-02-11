@@ -224,13 +224,25 @@ function formatDate(dateStr) {
  * カテゴリーに対応するカラーコードを返す
  */
 function getCategoryColor(cat) {
+    const data = loadData();
+    const trip = getCurrentTrip(data);
+    
+    if (trip && trip.settings && trip.settings.scheduleCategories) {
+        const category = trip.settings.scheduleCategories.find(c => c.value === cat);
+        if (category && category.color) {
+            return category.color;
+        }
+    }
+    
+    // デフォルトカラー（設定が見つからない場合）
     const colors = {
         '': '#bdc3c7',
+        unset: '#bdc3c7',
         sightseeing: '#3498db',
-        meal: '#e67e22',
-        transport: '#95a5a6',
+        meal: '#e74c3c',
+        transport: '#3498db',
         accommodation: '#9b59b6',
-        activity: '#2ecc71'
+        activity: '#f39c12'
     };
     return colors[cat] || '#bdc3c7';
 }
